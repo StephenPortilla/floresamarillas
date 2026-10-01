@@ -1,0 +1,441 @@
+:root {
+    /* Colores del tema del día */
+    --day-sky-top: #87CEEB;
+    --day-sky-bottom: #e0f6ff;
+    --day-sun: #FFD700;
+    --day-field: #8BC34A;
+    --day-field-bottom: #558B2F;
+    --day-text: #333333;
+    
+    /* Colores del tema nocturno */
+    --night-sky-top: #050821;
+    --night-sky-bottom: #2b2c80;
+    --night-moon: #e2e8f0;
+    --night-field: #08122c;
+    --night-field-bottom: #020512;
+    --night-text: #f0f0f0;
+
+    /* Común */
+    --primary-color: #FBC02D;
+    --primary-hover: #F9A825;
+    --secondary-color: rgba(255, 255, 255, 0.2);
+    --secondary-hover: rgba(255, 255, 255, 0.3);
+    
+    --transition-speed: 1.5s;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Outfit', sans-serif;
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+    color: var(--day-text);
+    transition: color var(--transition-speed) ease;
+}
+
+body.night {
+    color: var(--night-text);
+}
+
+/* Ambiente */
+#environment {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+.sky {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 60%;
+    background: linear-gradient(to bottom, var(--day-sky-top), var(--day-sky-bottom));
+    transition: background var(--transition-speed) ease;
+}
+
+body.night .sky {
+    background: linear-gradient(to bottom, var(--night-sky-top), var(--night-sky-bottom));
+}
+
+.stars {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        radial-gradient(1px 1px at 10% 20%, white, rgba(0,0,0,0)),
+        radial-gradient(1px 1px at 30% 50%, white, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 40% 10%, white, rgba(0,0,0,0)),
+        radial-gradient(1px 1px at 60% 30%, white, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 80% 40%, white, rgba(0,0,0,0)),
+        radial-gradient(1px 1px at 90% 10%, white, rgba(0,0,0,0));
+    background-size: 200px 200px;
+    opacity: 0;
+    transition: opacity var(--transition-speed) ease;
+}
+
+body.night .stars {
+    opacity: 0.8;
+}
+
+.celestial-body {
+    position: absolute;
+    top: 8%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: var(--day-sun);
+    box-shadow: 0 0 60px var(--day-sun);
+    transition: all 2s ease-in-out;
+}
+
+body.show-ui .celestial-body {
+    left: 20%;
+}
+
+body.night .celestial-body {
+    background: 
+        radial-gradient(circle at 35% 35%, rgba(0,0,0,0.15) 8%, transparent 10%),
+        radial-gradient(circle at 60% 55%, rgba(0,0,0,0.1) 12%, transparent 14%),
+        radial-gradient(circle at 30% 65%, rgba(0,0,0,0.15) 6%, transparent 8%),
+        radial-gradient(circle at 70% 30%, rgba(0,0,0,0.08) 5%, transparent 7%),
+        var(--night-moon);
+    box-shadow: 0 0 40px rgba(255, 255, 255, 0.5), 0 0 100px rgba(255, 255, 255, 0.2);
+}
+
+.field {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 50%;
+    background: linear-gradient(to bottom, var(--day-field), var(--day-field-bottom));
+    transition: background var(--transition-speed) ease;
+    z-index: 2;
+    /*Difumina suavemente el borde superior con el cielo*/
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 15%);
+    mask-image: linear-gradient(to bottom, transparent 0%, black 15%);
+}
+
+body.night .field {
+    background: linear-gradient(to bottom, var(--night-field), var(--night-field-bottom));
+}
+
+/* Secuencia de introducción */
+#intro-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 50; /* Encima del entorno, debajo de la interfaz */
+    pointer-events: none;
+    transition: opacity 2s ease-in-out;
+}
+
+#intro-canvas {
+    width: 100%;
+    height: 100%;
+    filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.4)) drop-shadow(0 0 5px rgba(255, 255, 255, 0.3));
+}
+
+/* Capa de interfaz */
+.ui-layer {
+    position: relative;
+    z-index: 60;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none; /* Deja que los clics pasen */
+    opacity: 0; /* Oculto al principio */
+    transform: translateY(20px);
+    transition: opacity 2s ease-in-out, transform 2s ease-in-out;
+}
+
+.ui-layer.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.ui-layer > * {
+    pointer-events: auto; /* Volver a habilitar para elementos de la interfaz */
+}
+
+/* Cambiar tema */
+.theme-toggle {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 8px 16px;
+    border-radius: 30px;
+    backdrop-filter: blur(5px);
+}
+
+#theme-switch {
+    display: none;
+}
+
+.switch-label {
+    position: relative;
+    width: 60px;
+    height: 30px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 15px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 5px;
+}
+
+.toggle-ball {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 26px;
+    height: 26px;
+    background: white;
+    border-radius: 50%;
+    transition: transform 0.3s ease;
+}
+
+#theme-switch:checked + .switch-label .toggle-ball {
+    transform: translateX(30px);
+}
+
+.icon {
+    font-size: 14px;
+}
+
+/* Contenido Principal */
+.main-content {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 10px; /* Subido para que todo quede cómodo */
+}
+
+.subtitle {
+    font-size: 0.9rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-bottom: 10px;
+    opacity: 0.9;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.title {
+    font-family: 'Playfair Display', serif;
+    font-size: 3.5rem;
+    line-height: 1.1;
+    margin-bottom: 30px;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.4);
+}
+
+body:not(.night) .subtitle,
+body:not(.night) .title {
+    color: white;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.6);
+}
+
+/* Ramo */
+.bouquet-wrapper {
+    width: 320px;
+    height: 400px;
+    margin-bottom: 20px;
+    margin-top: 0px;
+    animation: float 4s ease-in-out infinite;
+}
+
+@keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-15px); }
+    100% { transform: translateY(0px); }
+}
+
+.bouquet {
+    width: 100%;
+    height: 100%;
+}
+
+.bouquet svg {
+    width: 100%;
+    height: 100%;
+    filter: drop-shadow(0 15px 35px rgba(0,0,0,0.6));
+}
+
+/* Botones */
+.actions {
+    display: flex;
+    gap: 15px;
+}
+
+.btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 25px;
+    font-family: 'Outfit', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+}
+
+.btn.primary {
+    background-color: var(--primary-color);
+    color: #333;
+    box-shadow: 0 4px 15px rgba(251, 192, 45, 0.4);
+}
+
+.btn.primary:hover {
+    background-color: var(--primary-hover);
+    transform: scale(1.05);
+}
+
+.btn.secondary {
+    background-color: var(--secondary-color);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.btn.secondary:hover {
+    background-color: var(--secondary-hover);
+    transform: scale(1.05);
+}
+
+/* Modal */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(5px);
+    z-index: 100;
+    display: flex;
+    align-items: flex-end; /*Posición cerca del fondo*/
+    justify-content: center;
+    padding-bottom: 5vh; /*Pequeño espacio desde el borde de la pantalla*/
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.modal-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.card {
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    border-radius: 25px; /*Esquinas más suaves y redondeadas*/
+    padding: 25px 30px; /*Más compacto*/
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+    color: white;
+    position: relative;
+    transform: translateY(100px); /*Desliza hacia arriba desde más abajo*/
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+    border: 1px solid rgba(255,255,255,0.2);
+}
+
+body:not(.night) .card {
+    background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+    color: #333;
+}
+
+.modal-overlay.active .card {
+    transform: translateY(0);
+}
+
+.close-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: inherit;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+}
+
+.close-btn:hover {
+    opacity: 1;
+}
+
+.card-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+.card-decor {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    letter-spacing: 5px;
+}
+
+.card-message {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-bottom: 25px;
+    font-style: italic;
+}
+
+.card-signature {
+    font-weight: 600;
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+/*Lienzo*/
+#petal-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 50;
+    pointer-events: none;
+}
+
+/*Fondo de girasoles*/
+.bg-sunflower {
+    position: absolute;
+    bottom: 0;
+    transform-origin: bottom center;
+    transition: filter var(--transition-speed) ease;
+}
+
+body.night .bg-sunflower {
+    filter: brightness(0.6) saturate(0.8);
+}

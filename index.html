@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flores Amarillas</title>
+    <link rel="stylesheet" href="style.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&family=Playfair+Display:ital,wght@0,600;1,600&display=swap"
+        rel="stylesheet">
+</head>
+
+<body class="night">
+    <!-- Campo de Vuelo Intro -->
+    <section id="intro-container" aria-label="Animación de introducción">
+        <canvas id="intro-canvas"></canvas>
+    </section>
+
+    <!-- Entorno de fondo -->
+    <section id="environment" aria-hidden="true">
+        <div class="sky">
+            <div class="stars"></div>
+            <div class="celestial-body"></div>
+        </div>
+        <div class="field" id="field">
+            <!-- Girasoles de fondo generados mediante JS -->
+        </div>
+    </section>
+
+    <!-- Superposición de UI -->
+    <section class="ui-layer" id="main-ui">
+        <!-- Cambiar tema -->
+        <header class="theme-toggle">
+            <input type="checkbox" id="theme-switch" checked>
+            <label for="theme-switch" class="switch-label">
+                <span class="icon sun">☀️</span>
+                <span class="icon moon">🌙</span>
+                <div class="toggle-ball"></div>
+            </label>
+            <span class="toggle-text">Cambiar a Día</span>
+        </header>
+
+        <main class="main-content">
+            <header>
+                <p class="subtitle">UN DETALLE HECHO CON CARIÑO</p>
+                <h1 class="title">Flores amarillas<br>para ti</h1>
+            </header>
+
+            <figure class="bouquet-wrapper">
+                <div class="bouquet" id="bouquet">
+                    <!-- Ramo SVG creado dinámicamente -->
+                </div>
+            </figure>
+
+            <nav class="actions" aria-label="Acciones principales">
+                <button id="btn-card" class="btn primary">
+                    <span class="icon">✉️</span> Ver tarjeta
+                </button>
+                <button id="btn-petals" class="btn secondary">
+                    <span class="icon">✨</span> Lluvia de pétalos
+                </button>
+                <button id="btn-replay" class="btn secondary">
+                    <span class="icon">🌻</span> Repetir vuelo
+                </button>
+            </nav>
+        </main>
+    </section>
+
+    <!-- Modal de Tarjeta -->
+    <aside class="modal-overlay" id="card-modal" role="dialog" aria-modal="true" aria-labelledby="card-title">
+        <article class="card">
+            <button class="close-btn" id="close-modal" aria-label="Cerrar">&times;</button>
+            <div class="card-content">
+                <header>
+                    <h2 class="card-title" id="card-title">Para ...</h2>
+                    <div class="card-decor" aria-hidden="true">🌻 🌻 🌻</div>
+                </header>
+                <p class="card-message">
+                    Todavía no sé quién eres, no nos conocemos y no sé dónde estás... Pero sé que Dios cuida de ti con
+                    el mismo esmero con el que viste a las flores del campo. Mientras nos encontramos, le pido a É que haga
+                    florecer la paz y la alegría en tu corazón. :)
+                </p>
+                <footer class="card-signature">Con mucho cariño, Mileva P.</footer>
+            </div>
+        </article>
+    </aside>
+
+    <!-- Lienzo de Pétalos -->
+    <canvas id="petal-canvas"></canvas>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
